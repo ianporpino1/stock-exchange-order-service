@@ -1,7 +1,8 @@
 package com.stockexchange.orderservice.service;
 
-import com.matchingengine.model.Execution;
-import com.matchingengine.repository.ExecutionRepository;
+
+import com.stockexchange.orderservice.model.Execution;
+import com.stockexchange.orderservice.repository.ExecutionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

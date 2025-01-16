@@ -1,8 +1,9 @@
 package com.stockexchange.orderservice.controller.dto;
 
-import com.matchingengine.model.Order;
-import com.matchingengine.model.OrderStatus;
-import com.matchingengine.service.OrderService;
+
+
+import com.stockexchange.orderservice.model.Order;
+import com.stockexchange.orderservice.model.OrderStatus;
 
 import java.time.Instant;
 

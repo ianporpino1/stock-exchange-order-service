@@ -1,7 +1,10 @@
 package com.stockexchange.orderservice.service;
 
-import com.matchingengine.controller.dto.OrderResponse;
-import com.matchingengine.model.*;
+
+import com.stockexchange.orderservice.controller.dto.OrderResponse;
+import com.stockexchange.orderservice.model.Execution;
+import com.stockexchange.orderservice.model.Order;
+import com.stockexchange.orderservice.model.OrderBook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
