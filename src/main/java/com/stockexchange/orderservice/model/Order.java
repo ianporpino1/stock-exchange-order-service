@@ -3,12 +3,14 @@ package com.stockexchange.orderservice.model;
 import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.util.UUID;
+
 @Entity
 @Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private UUID id;
     private String symbol;
     private OrderType type;
     private OrderStatus status;
@@ -16,8 +18,8 @@ public class Order {
     private int executedQuantity;
     private int totalQuantity;
     private Instant createdAt;
-    @ManyToOne
-    private User user;
+    
+    private UUID userId;
 
     public Order(String symbol, OrderType type, int quantity, double price) {
         this.symbol = symbol;
@@ -31,11 +33,11 @@ public class Order {
 
     public Order() {}
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -63,12 +65,12 @@ public class Order {
         this.status = status;
     }
 
-    public User getUser() {
-        return user;
+    public UUID getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 
     public int getTotalQuantity() {

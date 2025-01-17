@@ -43,7 +43,7 @@ public class OrderBookService {
                     order.getExecutedQuantity(),
                     order.getTotalQuantity(),
                     order.getCreatedAt(),
-                    order.getUser().getId()
+                    order.getUserId()
             );
         }
         
@@ -71,7 +71,7 @@ public class OrderBookService {
                 executedQuantity,
                 order.getTotalQuantity(),
                 order.getCreatedAt(),
-                order.getUser().getId()
+                order.getUserId()
         );
     }
 
