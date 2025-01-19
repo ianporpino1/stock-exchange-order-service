@@ -72,7 +72,7 @@ public class OrderBook {
         return executions;
     }
 
-
+    
 
     public synchronized List<Order> getBuyOrders() {
         return new ArrayList<>(buyOrders);

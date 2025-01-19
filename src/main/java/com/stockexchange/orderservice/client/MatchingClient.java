@@ -2,13 +2,16 @@ package com.stockexchange.orderservice.client;
 
 import com.stockexchange.orderservice.controller.dto.MatchRequest;
 import com.stockexchange.orderservice.controller.dto.OrderResponse;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.service.annotation.HttpExchange;
-import org.springframework.web.service.annotation.PostExchange;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-@HttpExchange("/match")
+
+@FeignClient("matching-service")
 public interface MatchingClient {
     
-    @PostExchange
-    OrderResponse match(@RequestBody MatchRequest matchRequest);
+    @RequestMapping(method = RequestMethod.POST, value ="/match",consumes ="application/json")
+    OrderResponse match(@RequestBody MatchRequest request);
+    
 }

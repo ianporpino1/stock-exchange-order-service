@@ -28,8 +28,9 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest orderRequest, 
                                                      @AuthenticationPrincipal Jwt principal) {
-        //vai receber jwt com userId e role
-        //OrderResponse response  = matchingEngine.matchOrder(orderRequest, user);
+        //1. sera q salvo no banco de dados antes de enviar pro match?
+        
+        System.out.println(principal.getClaims().get("roles"));
         OrderResponse orderResponse= matchingClient.match(new MatchRequest(orderRequest, UUID.fromString(principal.getSubject())));
         
         return ResponseEntity.ok(orderResponse);
