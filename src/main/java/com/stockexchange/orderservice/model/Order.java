@@ -9,7 +9,6 @@ import java.util.UUID;
 @Table(name = "orders")
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private String symbol;
     private OrderType type;
@@ -18,17 +17,18 @@ public class Order {
     private int executedQuantity;
     private int totalQuantity;
     private Instant createdAt;
-    
     private UUID userId;
 
-    public Order(String symbol, OrderType type, int quantity, double price) {
+    public Order(UUID id, String symbol, OrderType type, OrderStatus status, double price, int executedQuantity, int totalQuantity, Instant createdAt, UUID userId) {
+        this.id = id;
         this.symbol = symbol;
         this.type = type;
         this.price = price;
-        this.executedQuantity = 0;
-        this.totalQuantity = quantity;
-        this.createdAt = Instant.now();
-        this.status = OrderStatus.ACCEPTED;
+        this.executedQuantity = executedQuantity;
+        this.totalQuantity = totalQuantity;
+        this.createdAt = createdAt;
+        this.status = status;
+        this.userId = userId;
     }
 
     public Order() {}

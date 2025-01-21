@@ -1,48 +1,70 @@
 package com.stockexchange.orderservice.service;
 
-
+import com.stockexchange.orderservice.client.MatchingClient;
+import com.stockexchange.orderservice.controller.dto.MatchRequest;
+import com.stockexchange.orderservice.controller.dto.MatchResponse;
+import com.stockexchange.orderservice.controller.dto.OrderRequest;
 import com.stockexchange.orderservice.controller.dto.OrderResponse;
 import com.stockexchange.orderservice.model.Order;
 import com.stockexchange.orderservice.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class OrderService {
     
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private MatchingClient matchingClient;
+
     
-    
-    public void saveOrder(Order order) {
-        orderRepository.save(order);
+    public OrderResponse createOrder(OrderRequest orderRequest, UUID userId) {
+        MatchResponse matchResponse = matchingClient.match(
+                new MatchRequest(orderRequest, userId));
+        
+        List<Order> orders = new ArrayList<>();
+        
+        OrderResponse responseForClient = null;
+        List<OrderResponse> sortedOrders = matchResponse.orders().stream()
+                .filter(orderResponse -> orderResponse.userId().equals(userId))
+                .sorted(Comparator.comparing(OrderResponse::orderDate).reversed())
+                .toList();
+        for(OrderResponse orderResponse: sortedOrders){
+            Order order = convertOrderResponseToOrder(orderResponse);
+            orders.add(order);
+            
+            if (responseForClient == null) {
+                responseForClient = orderResponse;
+            }
+        }
+        orderRepository.saveAll(orders);
+        
+        return responseForClient;
     }
 
-//    @Transactional
-//    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-//    public List<OrderResponse> getUserAuthenticatedOrders(UserDetails userDetails) {
-//        String username = userDetails.getUsername();
-//        boolean isAdmin = userDetails.getAuthorities().stream()
-//                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-//        
-//        List<Order> orders;
-//        if (isAdmin) {
-//            orders = orderRepository.findAll();
-//        } else {
-//            orders = orderRepository.findOrdersByUserId(username);
-//        }
-//        return orders.stream()
-//                .map(OrderResponse::new)
-//                .toList();
-//    }
+    private Order convertOrderResponseToOrder(OrderResponse orderResponse) {
+        return new Order(
+                orderResponse.orderId(),
+                orderResponse.symbol(),
+                orderResponse.orderType(),
+                orderResponse.orderStatus(),
+                orderResponse.price(),
+                orderResponse.executedQuantity(),
+                orderResponse.totalQuantity(), 
+                orderResponse.orderDate(),
+                orderResponse.userId()
+               
+        );
+    }
 
-    public void saveAllOrders(Set<Order> ordersToSave) {
-        orderRepository.saveAll(ordersToSave);
+    public OrderResponse getOrder(UUID id, UUID userId) {
+        Order order = orderRepository.findOrderById(id);
+        if(!order.getUserId().equals(userId)){
+            return null;
+        }
+        return new OrderResponse(order);
     }
 }
