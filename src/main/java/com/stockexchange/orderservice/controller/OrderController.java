@@ -18,12 +18,9 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
     
-    
-    
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest orderRequest, 
                                                      @AuthenticationPrincipal Jwt principal) {
-        //1. sera q salvo no banco de dados antes de enviar pro match?
         UUID userId = UUID.fromString(principal.getSubject());
         OrderResponse orderResponse = orderService.createOrder(orderRequest, userId);
         return ResponseEntity.ok(orderResponse);
