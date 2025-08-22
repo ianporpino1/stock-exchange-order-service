@@ -15,10 +15,22 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @Configuration
 public class ApiConfig {
-    
+
     @Bean
     @LoadBalanced
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    RestClient.Builder restClientBuilder() {
+        return RestClient.builder();
+    }
+
+    @Bean
+    public MatchingClient matchingClient(RestClient.Builder builder) {
+        RestClient restClient = builder
+                .baseUrl("http://matching-service")
+                .build();
+        RestClientAdapter adapter = RestClientAdapter.create(restClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+                .builderFor(adapter)
+                .build();
+        return factory.createClient(MatchingClient.class);
     }
 }
