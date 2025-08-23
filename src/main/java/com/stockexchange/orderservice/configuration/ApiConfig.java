@@ -1,6 +1,8 @@
 package com.stockexchange.orderservice.configuration;
 
 import com.stockexchange.orderservice.client.MatchingClient;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +20,10 @@ public class ApiConfig {
 
     @Bean
     @LoadBalanced
-    RestClient.Builder restClientBuilder() {
-        return RestClient.builder();
+    RestClient.Builder restClientBuilder(ObjectProvider<RestClientCustomizer> customizers) {
+        RestClient.Builder builder = RestClient.builder();
+        customizers.orderedStream().forEach(c -> c.customize(builder));
+        return builder;
     }
 
     @Bean
