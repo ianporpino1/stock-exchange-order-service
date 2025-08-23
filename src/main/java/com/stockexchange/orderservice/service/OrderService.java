@@ -22,6 +22,10 @@ public class OrderService {
 
     
     public OrderResponse createOrder(OrderRequest orderRequest, UUID userId) {
+        //validar ordem
+        //salvar no banco com status accepted
+        //qual sera a abordagem que vai mostrar uma diferenca de desempenho maior,
+        //retornar pro cliente sem esperar o matching ou esperar o matching e retornar a ordem
         MatchResponse matchResponse = matchingClient.match(
                 new MatchRequest(orderRequest, userId));
         
@@ -60,8 +64,8 @@ public class OrderService {
         );
     }
 
-    public OrderResponse getOrder(UUID id, UUID userId) {
-        Order order = orderRepository.findOrderById(id);
+    public OrderResponse getOrder(UUID orderId, UUID userId) {
+        Order order = orderRepository.findOrderByOrderId(orderId);
         if(!order.getUserId().equals(userId)){
             return null;
         }

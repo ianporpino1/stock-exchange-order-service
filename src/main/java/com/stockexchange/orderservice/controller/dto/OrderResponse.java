@@ -19,7 +19,7 @@ public record OrderResponse(
         UUID userId) {
     
     public OrderResponse(Order order) {
-        this(order.getId(), 
+        this(order.getOrderId(),
                 order.getStatus(),
                 order.getType(),
                 order.getSymbol(),

@@ -6,10 +6,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "trade_order")
 public class Order {
     @Id
-    private UUID id;
+    private UUID orderId;
     private String symbol;
     private OrderType type;
     private OrderStatus status;
@@ -20,7 +20,7 @@ public class Order {
     private UUID userId;
 
     public Order(UUID id, String symbol, OrderType type, OrderStatus status, double price, int executedQuantity, int totalQuantity, Instant createdAt, UUID userId) {
-        this.id = id;
+        this.orderId = id;
         this.symbol = symbol;
         this.type = type;
         this.price = price;
@@ -32,14 +32,6 @@ public class Order {
     }
 
     public Order() {}
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
     public String getSymbol() {
         return symbol;
@@ -83,5 +75,12 @@ public class Order {
 
     public void setExecutedQuantity(int executedQuantity) {
         this.executedQuantity = executedQuantity;
+    }
+
+    public UUID getOrderId() {
+        return orderId;
+    }
+    public void setOrderId(UUID orderId) {
+        this.orderId = orderId;
     }
 }

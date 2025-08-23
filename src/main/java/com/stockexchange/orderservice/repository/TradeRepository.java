@@ -1,10 +1,9 @@
 package com.stockexchange.orderservice.repository;
 
-
-import com.stockexchange.orderservice.model.Execution;
+import com.stockexchange.orderservice.model.Trade;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ExecutionRepository extends JpaRepository<Execution, Long> {
+public interface TradeRepository extends JpaRepository<Trade, Long> {
 }
