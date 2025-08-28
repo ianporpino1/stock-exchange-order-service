@@ -1,7 +1,7 @@
 package com.stockexchange.orderservice.controller;
 
-import com.stockexchange.orderservice.controller.dto.OrderRequest;
-import com.stockexchange.orderservice.controller.dto.OrderResponse;
+import com.stockexchange.orderservice.model.dto.OrderRequest;
+import com.stockexchange.orderservice.model.dto.OrderResponse;
 import com.stockexchange.orderservice.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,14 +23,14 @@ public class OrderController {
                                                      @AuthenticationPrincipal Jwt principal) {
         UUID userId = UUID.fromString(principal.getSubject());
         OrderResponse orderResponse = orderService.createOrder(orderRequest, userId);
-        return ResponseEntity.ok(orderResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);
     }
     
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrder(@PathVariable UUID id,
                                                   @AuthenticationPrincipal Jwt principal) {
         UUID userId = UUID.fromString(principal.getSubject());
-        OrderResponse orderResponse = orderService.getOrder(id, userId);
+        OrderResponse orderResponse = orderService.findOrderByIdWithSync(id, userId);
         if (orderResponse == null) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)

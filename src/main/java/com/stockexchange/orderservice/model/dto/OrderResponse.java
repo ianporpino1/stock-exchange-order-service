@@ -1,4 +1,4 @@
-package com.stockexchange.orderservice.controller.dto;
+package com.stockexchange.orderservice.model.dto;
 
 import com.stockexchange.orderservice.model.Order;
 import com.stockexchange.orderservice.model.OrderStatus;

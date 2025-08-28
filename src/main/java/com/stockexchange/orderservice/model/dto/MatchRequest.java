@@ -1,4 +1,4 @@
-package com.stockexchange.orderservice.controller.dto;
+package com.stockexchange.orderservice.model.dto;
 
 import java.util.UUID;
 

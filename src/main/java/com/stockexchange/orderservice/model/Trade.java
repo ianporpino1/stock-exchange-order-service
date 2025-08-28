@@ -1,8 +1,6 @@
 package com.stockexchange.orderservice.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
@@ -11,20 +9,19 @@ import java.util.UUID;
 @Table(name = "trade")
 public class Trade {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "trade_id", updatable = false, nullable = false)
     private UUID tradeId;
     @Column(name = "buy_order_id", nullable = false)
-    private Long buyOrderId;
+    private UUID buyOrderId;
 
     @Column(name = "sell_order_id", nullable = false)
-    private Long sellOrderId;
+    private UUID sellOrderId;
 
     @Column(name = "buyer_user_id", nullable = false)
-    private Long buyerUserId;
+    private UUID buyerUserId;
 
     @Column(name = "seller_user_id", nullable = false)
-    private Long sellerUserId;
+    private UUID sellerUserId;
 
     @Column(name = "symbol", nullable = false, length = 10)
     private String symbol;
@@ -32,44 +29,55 @@ public class Trade {
     private int quantity;
     @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal price;
-    @CreationTimestamp
     @Column(name = "executed_at", updatable = false, nullable = false)
     private Instant executedAt;
 
 
-    public Trade() {
-        
+    public Trade(UUID tradeId, UUID buyOrderId, UUID sellOrderId, UUID buyerUserId, UUID sellerUserId, String symbol, int quantity, BigDecimal price, Instant executedAt) {
+        this.tradeId = tradeId;
+        this.buyOrderId = buyOrderId;
+        this.sellOrderId = sellOrderId;
+        this.buyerUserId = buyerUserId;
+        this.sellerUserId = sellerUserId;
+        this.symbol = symbol;
+        this.quantity = quantity;
+        this.price = price;
+        this.executedAt = executedAt;
     }
 
-    public Long getBuyOrderId() {
+    public Trade() {
+
+    }
+
+    public UUID getBuyOrderId() {
         return buyOrderId;
     }
 
-    public void setBuyOrderId(Long buyOrderId) {
+    public void setBuyOrderId(UUID buyOrderId) {
         this.buyOrderId = buyOrderId;
     }
 
-    public Long getSellOrderId() {
+    public UUID getSellOrderId() {
         return sellOrderId;
     }
 
-    public void setSellOrderId(Long sellOrderId) {
+    public void setSellOrderId(UUID sellOrderId) {
         this.sellOrderId = sellOrderId;
     }
 
-    public Long getBuyerUserId() {
+    public UUID getBuyerUserId() {
         return buyerUserId;
     }
 
-    public void setBuyerUserId(Long buyerUserId) {
+    public void setBuyerUserId(UUID buyerUserId) {
         this.buyerUserId = buyerUserId;
     }
 
-    public Long getSellerUserId() {
+    public UUID getSellerUserId() {
         return sellerUserId;
     }
 
-    public void setSellerUserId(Long sellerUserId) {
+    public void setSellerUserId(UUID sellerUserId) {
         this.sellerUserId = sellerUserId;
     }
 
