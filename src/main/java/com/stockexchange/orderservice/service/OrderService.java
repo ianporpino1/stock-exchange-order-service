@@ -17,11 +17,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final MatchingClient matchingClient;
     private final TradeService tradeService;
+    private final WalService logService;
 
-    public OrderService(OrderRepository orderRepository, MatchingClient matchingClient, TradeService tradeService) {
+    public OrderService(OrderRepository orderRepository, MatchingClient matchingClient, TradeService tradeService, WalService logService) {
         this.orderRepository = orderRepository;
         this.matchingClient = matchingClient;
         this.tradeService = tradeService;
+        this.logService = logService;
     }
 
     public OrderResponse createOrder(OrderRequest orderRequest, UUID userId) {
@@ -43,6 +45,7 @@ public class OrderService {
         );
 
         //WAL - Write Ahead Log - salvar o comando em um log antes de enviar pro matching
+        logService.log(command);
 
         //structured concurrency p fazer essa chamada de forma assincrona
         //e retornar a resposta mais rapido pro cliente
@@ -127,5 +130,9 @@ public class OrderService {
         }
 
         return new OrderResponse(localOrder);
+    }
+
+    public List<CreateOrderCommand> recoverOrders() {
+        return logService.readAll();
     }
 }

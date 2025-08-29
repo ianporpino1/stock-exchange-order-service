@@ -19,6 +19,7 @@ public class SecurityConfig  {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/orders/recovery").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(conf -> conf.jwt(Customizer.withDefaults()));
 

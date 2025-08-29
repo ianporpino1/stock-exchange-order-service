@@ -1,5 +1,6 @@
 package com.stockexchange.orderservice.controller;
 
+import com.stockexchange.orderservice.model.dto.CreateOrderCommand;
 import com.stockexchange.orderservice.model.dto.OrderRequest;
 import com.stockexchange.orderservice.model.dto.OrderResponse;
 import com.stockexchange.orderservice.service.OrderService;
@@ -9,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -37,6 +40,12 @@ public class OrderController {
                     .build();
         }
         return ResponseEntity.ok(orderResponse);
+    }
+
+    @GetMapping("/recovery")
+    public ResponseEntity<List<CreateOrderCommand>> recoverOrders() {
+        var orderCommands = orderService.recoverOrders();
+        return ResponseEntity.ok(orderCommands);
     }
     
 }
