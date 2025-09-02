@@ -1,6 +1,7 @@
 package com.stockexchange.orderservice.model.dto;
 
 import com.stockexchange.orderservice.model.OrderType;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -8,11 +9,11 @@ public record CreateOrderCommand(UUID commandId,
                                  UUID orderId,
                                  UUID userId,
                                  String symbol,
-                                 double price,
+                                 BigDecimal price,
                                  int quantity,
                                  OrderType orderType,
                                  Instant createdAt) {
-    public CreateOrderCommand(OrderRequest orderRequest, UUID commandId, UUID orderId, UUID userId, Instant createdAt) {
+    public CreateOrderCommand(OrderRequest orderRequest, UUID commandId, UUID orderId, UUID userId) {
         this(
                 commandId,
                 orderId,
@@ -21,6 +22,6 @@ public record CreateOrderCommand(UUID commandId,
                 orderRequest.price(),
                 orderRequest.quantity(),
                 orderRequest.orderType(),
-                createdAt);
+                Instant.now());
     }
 }

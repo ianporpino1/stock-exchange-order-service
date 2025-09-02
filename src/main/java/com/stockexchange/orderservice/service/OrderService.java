@@ -34,14 +34,12 @@ public class OrderService {
         //retornar pro cliente sem esperar o matching ou esperar o matching e retornar a ordem
         UUID commandId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
-        Instant createdAt = Instant.now();
 
         CreateOrderCommand command = new CreateOrderCommand(
                 orderRequest,
                 commandId,
                 orderId,
-                userId,
-                createdAt
+                userId
         );
 
         //WAL - Write Ahead Log - salvar o comando em um log antes de enviar pro matching

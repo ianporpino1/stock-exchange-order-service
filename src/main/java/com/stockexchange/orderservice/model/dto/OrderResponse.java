@@ -4,6 +4,7 @@ import com.stockexchange.orderservice.model.Order;
 import com.stockexchange.orderservice.model.OrderStatus;
 import com.stockexchange.orderservice.model.OrderType;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -12,7 +13,7 @@ public record OrderResponse(
         OrderStatus orderStatus,
         OrderType orderType,
         String symbol,
-        double price,
+        BigDecimal price,
         int executedQuantity,
         int totalQuantity,
         Instant orderDate,

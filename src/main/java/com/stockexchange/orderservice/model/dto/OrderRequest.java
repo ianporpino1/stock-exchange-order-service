@@ -1,6 +1,7 @@
 package com.stockexchange.orderservice.model.dto;
 
 import com.stockexchange.orderservice.model.OrderType;
+import java.math.BigDecimal;
 
-public record OrderRequest(String symbol, double price, int quantity, OrderType orderType) {
+public record OrderRequest(String symbol, BigDecimal price, int quantity, OrderType orderType) {
 }
