@@ -1,6 +1,7 @@
 package com.stockexchange.orderservice.configuration;
 
 import com.stockexchange.orderservice.client.MatchingClient;
+import com.stockexchange.orderservice.client.PortfolioClient;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -36,5 +37,16 @@ public class ApiConfig {
                 .builderFor(adapter)
                 .build();
         return factory.createClient(MatchingClient.class);
+    }
+    @Bean
+    public PortfolioClient portfolioClient(RestClient.Builder builder) {
+        RestClient restClient = builder
+                .baseUrl("http://portfolio-service")
+                .build();
+        RestClientAdapter adapter = RestClientAdapter.create(restClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+                .builderFor(adapter)
+                .build();
+        return factory.createClient(PortfolioClient.class);
     }
 }

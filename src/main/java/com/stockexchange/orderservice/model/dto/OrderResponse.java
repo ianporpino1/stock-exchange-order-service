@@ -30,4 +30,16 @@ public record OrderResponse(
                 order.getCreatedAt(), 
                 order.getUserId());
     }
+
+    public OrderResponse(CreateOrderCommand command) {
+        this(command.orderId(),
+                OrderStatus.ACCEPTED,
+                command.orderType(),
+                command.symbol(),
+                command.price(),
+                0,
+                command.quantity(),
+                command.createdAt(),
+                command.userId());
+    }
 }

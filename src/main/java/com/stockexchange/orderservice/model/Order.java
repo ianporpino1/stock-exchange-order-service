@@ -1,7 +1,6 @@
 package com.stockexchange.orderservice.model;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
@@ -12,7 +11,9 @@ public class Order {
     @Id
     private UUID orderId;
     private String symbol;
+    @Enumerated(EnumType.STRING)
     private OrderType type;
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
     private BigDecimal price;
     private int executedQuantity;
@@ -33,6 +34,18 @@ public class Order {
     }
 
     public Order() {}
+
+    public Order(UUID orderId, UUID userId, OrderType type, int quantity, BigDecimal price, String symbol) {
+        this.orderId = orderId;
+        this.userId = userId;
+        this.type = type;
+        this.executedQuantity = 0;
+        this.totalQuantity = quantity;
+        this.createdAt = Instant.now();
+        this.status = OrderStatus.PENDING;
+        this.price = price;
+        this.symbol = symbol;
+    }
 
     public String getSymbol() {
         return symbol;

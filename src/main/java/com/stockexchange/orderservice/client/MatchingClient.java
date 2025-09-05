@@ -22,10 +22,10 @@ import java.util.UUID;
 public interface MatchingClient {
 
     @PostExchange(value = "/match")
-    @CircuitBreaker(name = "matching-service", fallbackMethod = "matchFallback")
-    @Bulkhead(name = "matching-service")
-    @Retry(name = "matching-service")
-    @RateLimiter(name = "matching-service")
+//    @CircuitBreaker(name = "matching-service", fallbackMethod = "matchFallback")
+//    @Bulkhead(name = "matching-service")
+//    @Retry(name = "matching-service")
+//    @RateLimiter(name = "matching-service")
     MatchResponse match(@RequestBody CreateOrderCommand request);
 
     default MatchResponse matchFallback(CreateOrderCommand command, Throwable t) {
