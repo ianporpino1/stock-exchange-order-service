@@ -14,14 +14,11 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final MatchingClient matchingClient;
-    private final WalService logService;
     private final TradeService tradeService;
 
-    public OrderService(OrderRepository orderRepository, MatchingClient matchingClient, WalService logService, TradeService tradeService) {
+    public OrderService(OrderRepository orderRepository, MatchingClient matchingClient, TradeService tradeService) {
         this.orderRepository = orderRepository;
         this.matchingClient = matchingClient;
-        this.logService = logService;
-
         this.tradeService = tradeService;
     }
 
@@ -118,26 +115,37 @@ public class OrderService {
         return new OrderResponse(order);
     }
 
-    public OrderResponse findOrderByIdWithSync(UUID orderId, UUID userId) {
-        Order localOrder = orderRepository.findOrderByOrderId(orderId);
-        if (!localOrder.getUserId().equals(userId)) {
-            return null;
-        }
-
-        if (localOrder.getStatus().equals(OrderStatus.ACCEPTED) || localOrder.getStatus().equals(OrderStatus.PARTIALLY_EXECUTED)) {
-            OrderResponse liveStatus = matchingClient.getOrderById(orderId);
-            if (!liveStatus.orderStatus().equals(localOrder.getStatus())) {
-                localOrder.setStatus(liveStatus.orderStatus());
-                localOrder.setExecutedQuantity(liveStatus.executedQuantity());
-                orderRepository.save(localOrder);
-            }
-        }
-
-        return new OrderResponse(localOrder);
-    }
+//    public OrderResponse findOrderByIdWithSync(UUID orderId, UUID userId) {
+//        Order localOrder = orderRepository.findOrderByOrderId(orderId);
+//        if (!localOrder.getUserId().equals(userId)) {
+//            return null;
+//        }
+//
+//        if (localOrder.getStatus().equals(OrderStatus.ACCEPTED) || localOrder.getStatus().equals(OrderStatus.PARTIALLY_EXECUTED)) {
+//            OrderResponse liveStatus = matchingClient.getOrderById(orderId);
+//            if (!liveStatus.orderStatus().equals(localOrder.getStatus())) {
+//                localOrder.setStatus(liveStatus.orderStatus());
+//                localOrder.setExecutedQuantity(liveStatus.executedQuantity());
+//                orderRepository.save(localOrder);
+//            }
+//        }
+//
+//        return new OrderResponse(localOrder);
+//    }
 
     public List<CreateOrderCommand> recoverOrders() {
-        return logService.readAll();
+        return orderRepository.findByStatusIn(List.of(OrderStatus.PENDING,OrderStatus.ACCEPTED, OrderStatus.PARTIALLY_EXECUTED))
+                .stream()
+                .map(order -> new CreateOrderCommand(
+                        new OrderRequest(order.getSymbol(),
+                                order.getPrice(),
+                                order.getTotalQuantity() - order.getExecutedQuantity(),
+                                order.getType()),
+                        UUID.randomUUID(),
+                        order.getOrderId(),
+                        order.getUserId()
+                ))
+                .toList();
     }
 
     public void saveAll(List<Order> orders) {

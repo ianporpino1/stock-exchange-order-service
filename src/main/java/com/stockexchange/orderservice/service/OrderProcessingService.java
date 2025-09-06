@@ -5,11 +5,11 @@ import com.stockexchange.orderservice.model.dto.CreateOrderCommand;
 import com.stockexchange.orderservice.model.dto.MatchResponse;
 import com.stockexchange.orderservice.model.dto.OrderResponse;
 import com.stockexchange.orderservice.repository.OrderRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,58 +18,29 @@ public class OrderProcessingService {
     private final MatchService matchService;
     private final TradeService tradeService;
     private final PortfolioService portfolioService;
+    private final OrderHandler orderHandler;
 
-    public OrderProcessingService(OrderRepository orderRepository, MatchService matchService, TradeService tradeService, PortfolioService portfolioService) {
+    public OrderProcessingService(OrderRepository orderRepository, MatchService matchService, TradeService tradeService, PortfolioService portfolioService, OrderHandler orderHandler) {
         this.orderRepository = orderRepository;
         this.matchService = matchService;
         this.tradeService = tradeService;
         this.portfolioService = portfolioService;
+        this.orderHandler = orderHandler;
     }
 
-
+    @Async
+    @Transactional
     public void sendOrderToMatching(CreateOrderCommand command) {
         MatchResponse matchResponse = matchService.match(command);
         this.handleMatch(matchResponse);
     }
 
-    public void handleOrders(MatchResponse matchResponse) {
-        Map<UUID, OrderResponse> latestOrderStates = matchResponse.orders().stream()
-                .collect(Collectors.toMap(
-                        OrderResponse::orderId, dto -> dto, (_, replacement) -> replacement
-                ));
 
-        if (!latestOrderStates.isEmpty()) {
-            List<UUID> orderIds = new ArrayList<>(latestOrderStates.keySet());
-
-            List<Order> existingOrders = orderRepository.findAllById(orderIds);
-
-            existingOrders.forEach(order -> {
-                OrderResponse dto = latestOrderStates.get(order.getOrderId());
-                order.setStatus(dto.orderStatus());
-                order.setExecutedQuantity(dto.executedQuantity());
-            });
-
-            orderRepository.saveAll(existingOrders);
-        }
-    }
 
     public void handleMatch(MatchResponse matchResponse) {
-        handleOrders(matchResponse);
+        orderHandler.handleOrders(matchResponse);
+        portfolioService.handlePortfolioUpdates(matchResponse);
         tradeService.handleTrade(matchResponse);
-//        portfolioService.handlePortfolioUpdates(matchResponse);
     }
-    public Order convertOrderResponseToOrder(OrderResponse orderResponse) {
-        return new Order(
-                orderResponse.orderId(),
-                orderResponse.symbol(),
-                orderResponse.orderType(),
-                orderResponse.orderStatus(),
-                orderResponse.price(),
-                orderResponse.executedQuantity(),
-                orderResponse.totalQuantity(),
-                orderResponse.orderDate(),
-                orderResponse.userId()
 
-        );
-    }
 }

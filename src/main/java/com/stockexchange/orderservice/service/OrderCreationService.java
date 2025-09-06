@@ -12,12 +12,10 @@ import java.util.UUID;
 @Service
 public class OrderCreationService {
 
-    private final WalService logService;
     private final OrderProcessingService orderProcessingService;
     private final OrderRepository orderRepository;
 
-    public OrderCreationService(WalService logService, OrderProcessingService orderProcessingService, OrderRepository orderRepository) {
-        this.logService = logService;
+    public OrderCreationService(OrderProcessingService orderProcessingService, OrderRepository orderRepository) {
         this.orderProcessingService = orderProcessingService;
         this.orderRepository = orderRepository;
     }
@@ -30,7 +28,7 @@ public class OrderCreationService {
         orderRepository.save(pendingOrder);
 
         CreateOrderCommand command = new CreateOrderCommand(orderRequest, UUID.randomUUID(), orderId, userId);
-        logService.log(command);
+//        logService.log(command);
 
 
         orderProcessingService.sendOrderToMatching(command);

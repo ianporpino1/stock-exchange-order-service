@@ -17,11 +17,6 @@ public class TradeService {
         this.tradeRepository = tradeRepository;
     }
 
-    public void saveAllTrades(List<Trade> trades) {
-        tradeRepository.saveAll(trades);
-    }
-
-
     public void handleTrade(MatchResponse matchResponse) {
         if(!matchResponse.trades().isEmpty()){
             List<Trade> trades = new ArrayList<>();
@@ -40,8 +35,6 @@ public class TradeService {
                 trades.add(trade);
             }
             tradeRepository.saveAll(trades);
-
-
         }
     }
 }

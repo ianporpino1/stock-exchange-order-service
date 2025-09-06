@@ -43,7 +43,7 @@ public class OrderController {
     public ResponseEntity<OrderResponse> getOrder(@PathVariable UUID id,
                                                   @AuthenticationPrincipal Jwt principal) {
         UUID userId = UUID.fromString(principal.getSubject());
-        OrderResponse orderResponse = orderService.findOrderByIdWithSync(id, userId);
+        OrderResponse orderResponse = orderService.getOrder(id, userId);
         if (orderResponse == null) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)

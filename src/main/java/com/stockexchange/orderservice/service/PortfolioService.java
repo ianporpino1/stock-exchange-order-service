@@ -14,6 +14,8 @@ public class PortfolioService {
     }
 
     public void handlePortfolioUpdates(MatchResponse matchResponse) {
-        portfolioClient.processExecutedTrades(new TradeListResponse(matchResponse.trades()));
+        if(!matchResponse.trades().isEmpty()) {
+            portfolioClient.processExecutedTrades(new TradeListResponse(matchResponse.trades()));
+        }
     }
 }
