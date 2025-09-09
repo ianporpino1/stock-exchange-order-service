@@ -31,7 +31,7 @@ public class OrderCreationService {
 //        logService.log(command);
 
 
-        orderProcessingService.sendOrderToMatching(command);
+        orderProcessingService.processOrder(command);
         return new OrderResponse(pendingOrder);
     }
 }
