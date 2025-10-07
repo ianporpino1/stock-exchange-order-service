@@ -1,9 +1,10 @@
-package com.stockexchange.orderservice.controller.dto;
+package com.stockexchange.orderservice.model.dto;
 
 import com.stockexchange.orderservice.model.Order;
 import com.stockexchange.orderservice.model.OrderStatus;
 import com.stockexchange.orderservice.model.OrderType;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -12,14 +13,14 @@ public record OrderResponse(
         OrderStatus orderStatus,
         OrderType orderType,
         String symbol,
-        double price,
+        BigDecimal price,
         int executedQuantity,
         int totalQuantity,
         Instant orderDate,
         UUID userId) {
     
     public OrderResponse(Order order) {
-        this(order.getId(), 
+        this(order.getOrderId(),
                 order.getStatus(),
                 order.getType(),
                 order.getSymbol(),
@@ -28,5 +29,17 @@ public record OrderResponse(
                 order.getTotalQuantity(),
                 order.getCreatedAt(), 
                 order.getUserId());
+    }
+
+    public OrderResponse(CreateOrderCommand command) {
+        this(command.orderId(),
+                OrderStatus.ACCEPTED,
+                command.orderType(),
+                command.symbol(),
+                command.price(),
+                0,
+                command.quantity(),
+                command.createdAt(),
+                command.userId());
     }
 }

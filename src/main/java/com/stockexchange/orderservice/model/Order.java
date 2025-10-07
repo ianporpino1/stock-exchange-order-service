@@ -1,26 +1,28 @@
 package com.stockexchange.orderservice.model;
 
 import jakarta.persistence.*;
-
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "trade_order")
 public class Order {
     @Id
-    private UUID id;
+    private UUID orderId;
     private String symbol;
+    @Enumerated(EnumType.STRING)
     private OrderType type;
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
-    private double price;
+    private BigDecimal price;
     private int executedQuantity;
     private int totalQuantity;
     private Instant createdAt;
     private UUID userId;
 
-    public Order(UUID id, String symbol, OrderType type, OrderStatus status, double price, int executedQuantity, int totalQuantity, Instant createdAt, UUID userId) {
-        this.id = id;
+    public Order(UUID id, String symbol, OrderType type, OrderStatus status, BigDecimal price, int executedQuantity, int totalQuantity, Instant createdAt, UUID userId) {
+        this.orderId = id;
         this.symbol = symbol;
         this.type = type;
         this.price = price;
@@ -33,12 +35,16 @@ public class Order {
 
     public Order() {}
 
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
+    public Order(UUID orderId, UUID userId, OrderType type, int quantity, BigDecimal price, String symbol) {
+        this.orderId = orderId;
+        this.userId = userId;
+        this.type = type;
+        this.executedQuantity = 0;
+        this.totalQuantity = quantity;
+        this.createdAt = Instant.now();
+        this.status = OrderStatus.PENDING;
+        this.price = price;
+        this.symbol = symbol;
     }
 
     public String getSymbol() {
@@ -49,7 +55,7 @@ public class Order {
         return type;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice(){
         return price;
     }
 
@@ -83,5 +89,12 @@ public class Order {
 
     public void setExecutedQuantity(int executedQuantity) {
         this.executedQuantity = executedQuantity;
+    }
+
+    public UUID getOrderId() {
+        return orderId;
+    }
+    public void setOrderId(UUID orderId) {
+        this.orderId = orderId;
     }
 }
