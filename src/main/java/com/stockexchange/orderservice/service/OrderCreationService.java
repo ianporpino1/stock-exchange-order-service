@@ -5,7 +5,6 @@ import com.stockexchange.orderservice.model.dto.CreateOrderCommand;
 import com.stockexchange.orderservice.model.dto.OrderRequest;
 import com.stockexchange.orderservice.model.dto.OrderResponse;
 import com.stockexchange.orderservice.repository.OrderRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
@@ -20,7 +19,7 @@ public class OrderCreationService {
         this.orderRepository = orderRepository;
     }
 
-    @Transactional
+
     public OrderResponse createOrder(OrderRequest orderRequest, UUID userId) {
         UUID orderId = UUID.randomUUID();
 
@@ -28,8 +27,6 @@ public class OrderCreationService {
         orderRepository.save(pendingOrder);
 
         CreateOrderCommand command = new CreateOrderCommand(orderRequest, UUID.randomUUID(), orderId, userId);
-//        logService.log(command);
-
 
         orderProcessingService.processOrder(command);
         return new OrderResponse(pendingOrder);

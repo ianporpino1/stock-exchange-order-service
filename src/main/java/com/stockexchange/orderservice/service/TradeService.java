@@ -4,6 +4,7 @@ import com.stockexchange.orderservice.model.Trade;
 import com.stockexchange.orderservice.model.dto.MatchResponse;
 import com.stockexchange.orderservice.model.dto.TradeResponse;
 import com.stockexchange.orderservice.repository.TradeRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ public class TradeService {
         this.tradeRepository = tradeRepository;
     }
 
+    @Transactional
     public void handleTrade(MatchResponse matchResponse) {
         if(!matchResponse.trades().isEmpty()){
             List<Trade> trades = new ArrayList<>();

@@ -8,6 +8,8 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
@@ -15,6 +17,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.client.support.RestTemplateAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @Configuration
 public class ApiConfig {
@@ -48,5 +53,10 @@ public class ApiConfig {
                 .builderFor(adapter)
                 .build();
         return factory.createClient(PortfolioClient.class);
+    }
+
+    @Bean(name = "taskExecutor")
+    public TaskExecutor taskExecutor() {
+        return new VirtualThreadTaskExecutor();
     }
 }
