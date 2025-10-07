@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public interface MatchingClient {
 //    @Bulkhead(name = "matching-service")
 //    @Retry(name = "matching-service")
 //    @RateLimiter(name = "matching-service")
-    MatchResponse match(@RequestBody CreateOrderCommand request);
+    Mono<MatchResponse> match(@RequestBody CreateOrderCommand request);
 
     default MatchResponse matchFallback(CreateOrderCommand command, Throwable t) {
         System.err.printf("FALLBACK ATIVADO para a ordem %s. Causa: %s%n",

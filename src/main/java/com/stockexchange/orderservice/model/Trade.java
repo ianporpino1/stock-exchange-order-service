@@ -1,37 +1,39 @@
 package com.stockexchange.orderservice.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
-@Entity
 @Table(name = "trade")
-public class Trade {
+public class Trade implements Persistable<UUID> {
     @Id
-    @Column(name = "trade_id", updatable = false, nullable = false)
+    @Column("trade_id")
     private UUID tradeId;
-    @Column(name = "buy_order_id", nullable = false)
+    @Column("buy_order_id")
     private UUID buyOrderId;
 
-    @Column(name = "sell_order_id", nullable = false)
+    @Column("sell_order_id")
     private UUID sellOrderId;
 
-    @Column(name = "buyer_user_id", nullable = false)
+    @Column("buyer_user_id")
     private UUID buyerUserId;
 
-    @Column(name = "seller_user_id", nullable = false)
+    @Column("seller_user_id")
     private UUID sellerUserId;
 
-    @Column(name = "symbol", nullable = false, length = 10)
+    @Column("symbol")
     private String symbol;
-    @Column(nullable = false)
     private int quantity;
-    @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal price;
-    @Column(name = "executed_at", updatable = false, nullable = false)
     private Instant executedAt;
 
+    @Transient
+    private final boolean isNew;
 
     public Trade(UUID tradeId, UUID buyOrderId, UUID sellOrderId, UUID buyerUserId, UUID sellerUserId, String symbol, int quantity, BigDecimal price, Instant executedAt) {
         this.tradeId = tradeId;
@@ -43,10 +45,7 @@ public class Trade {
         this.quantity = quantity;
         this.price = price;
         this.executedAt = executedAt;
-    }
-
-    public Trade() {
-
+        this.isNew = true;
     }
 
     public UUID getBuyOrderId() {
@@ -119,5 +118,16 @@ public class Trade {
 
     public void setTradeId(UUID tradeId) {
         this.tradeId = tradeId;
+    }
+
+    @Override
+    public UUID getId() {
+        return this.tradeId;
+    }
+
+    @Override
+    @Transient
+    public boolean isNew() {
+        return isNew;
     }
 }

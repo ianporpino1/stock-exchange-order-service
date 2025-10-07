@@ -4,6 +4,7 @@ import com.stockexchange.orderservice.client.MatchingClient;
 import com.stockexchange.orderservice.client.PortfolioClient;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.web.client.RestClientCustomizer;
+import org.springframework.boot.web.reactive.function.client.WebClientCustomizer;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,8 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.client.support.RestTemplateAdapter;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import java.util.concurrent.Executor;
@@ -26,29 +29,29 @@ public class ApiConfig {
 
     @Bean
     @LoadBalanced
-    RestClient.Builder restClientBuilder(ObjectProvider<RestClientCustomizer> customizers) {
-        RestClient.Builder builder = RestClient.builder();
+    WebClient.Builder webClientBuilder(ObjectProvider<WebClientCustomizer> customizers) {
+        WebClient.Builder builder = WebClient.builder();
         customizers.orderedStream().forEach(c -> c.customize(builder));
         return builder;
     }
 
     @Bean
-    public MatchingClient matchingClient(RestClient.Builder builder) {
-        RestClient restClient = builder
+    public MatchingClient matchingClient(WebClient.Builder builder) {
+        WebClient webClient = builder
                 .baseUrl("http://matching-service")
                 .build();
-        RestClientAdapter adapter = RestClientAdapter.create(restClient);
+        WebClientAdapter adapter = WebClientAdapter.create(webClient);
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
                 .builderFor(adapter)
                 .build();
         return factory.createClient(MatchingClient.class);
     }
     @Bean
-    public PortfolioClient portfolioClient(RestClient.Builder builder) {
-        RestClient restClient = builder
+    public PortfolioClient portfolioClient(WebClient.Builder builder) {
+        WebClient webClien = builder
                 .baseUrl("http://portfolio-service")
                 .build();
-        RestClientAdapter adapter = RestClientAdapter.create(restClient);
+        WebClientAdapter adapter = WebClientAdapter.create(webClien);
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
                 .builderFor(adapter)
                 .build();

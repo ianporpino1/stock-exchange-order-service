@@ -4,6 +4,9 @@ import com.stockexchange.orderservice.model.dto.*;
 import com.stockexchange.orderservice.model.Order;
 import com.stockexchange.orderservice.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import java.util.*;
 
 @Service
@@ -15,17 +18,14 @@ public class OrderService {
         this.orderRepository = orderRepository;
     }
 
-    public OrderResponse getOrder(UUID orderId, UUID userId) {
-        Order order = orderRepository.findOrderByOrderId(orderId);
-        if (!order.getUserId().equals(userId)) {
-            return null;
-        }
-        return new OrderResponse(order);
+    public Mono<OrderResponse> getOrder(UUID orderId, UUID userId) {
+        return orderRepository.findOrderByOrderId(orderId)
+                .filter(order -> order.getUserId().equals(userId))
+                .map(OrderResponse::new);
     }
 
-    public List<CreateOrderCommand> recoverOrders() {
+    public Flux<CreateOrderCommand> recoverOrders() {
         return orderRepository.findAll()
-                .stream()
                 .map(order -> new CreateOrderCommand(
                         new OrderRequest(order.getSymbol(),
                                 order.getPrice(),
@@ -34,8 +34,7 @@ public class OrderService {
                         UUID.randomUUID(),
                         order.getOrderId(),
                         order.getUserId()
-                ))
-                .toList();
+                ));
     }
 
     public void saveAll(List<Order> orders) {

@@ -4,6 +4,7 @@ import com.stockexchange.orderservice.client.MatchingClient;
 import com.stockexchange.orderservice.model.dto.CreateOrderCommand;
 import com.stockexchange.orderservice.model.dto.MatchResponse;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 
 @Service
@@ -15,7 +16,7 @@ public class MatchService {
         this.matchingClient = matchingClient;
     }
 
-    public MatchResponse match(CreateOrderCommand command) {
+    public Mono<MatchResponse> match(CreateOrderCommand command) {
         return matchingClient.match(command);
     }
 }

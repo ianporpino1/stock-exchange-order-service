@@ -2,11 +2,9 @@ package com.stockexchange.orderservice.service;
 
 import com.stockexchange.orderservice.model.Trade;
 import com.stockexchange.orderservice.model.dto.MatchResponse;
-import com.stockexchange.orderservice.model.dto.TradeResponse;
 import com.stockexchange.orderservice.repository.TradeRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
+import reactor.core.publisher.Mono;
 import java.util.List;
 
 @Service
@@ -18,12 +16,14 @@ public class TradeService {
         this.tradeRepository = tradeRepository;
     }
 
-    @Transactional
-    public void handleTrade(MatchResponse matchResponse) {
-        if(!matchResponse.trades().isEmpty()){
-            List<Trade> trades = new ArrayList<>();
-            for(TradeResponse tradeResponse: matchResponse.trades()){
-                Trade trade = new Trade(
+
+    public Mono<Void> handleTrade(MatchResponse matchResponse) {
+        if (matchResponse.trades().isEmpty()) {
+            return Mono.empty();
+        }
+
+        List<Trade> trades = matchResponse.trades().stream()
+                .map(tradeResponse -> new Trade(
                         tradeResponse.tradeId(),
                         tradeResponse.buyOrderId(),
                         tradeResponse.sellOrderId(),
@@ -33,10 +33,8 @@ public class TradeService {
                         tradeResponse.quantity(),
                         tradeResponse.price(),
                         tradeResponse.executedAt()
-                );
-                trades.add(trade);
-            }
-            tradeRepository.saveAll(trades);
-        }
+                ))
+                .toList();
+        return tradeRepository.saveAll(trades).then();
     }
 }

@@ -4,6 +4,8 @@ import com.stockexchange.orderservice.model.dto.CreateOrderCommand;
 import com.stockexchange.orderservice.model.dto.MatchResponse;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 public class OrderProcessingService {
@@ -19,12 +21,22 @@ public class OrderProcessingService {
         this.orderHandler = orderHandler;
     }
 
-    @Async
-    public void processOrder(CreateOrderCommand command) {
-        MatchResponse matchResponse = matchService.match(command);
-        orderHandler.handleOrders(matchResponse);
-        tradeService.handleTrade(matchResponse);
-        portfolioService.handlePortfolioUpdates(matchResponse);
+
+    public Mono<Void> processOrder(CreateOrderCommand command) {
+        return matchService.match(command)
+                .flatMap(matchResponse -> {
+
+                    Mono<Void> ordersTask = orderHandler.handleOrders(matchResponse)
+                            .subscribeOn(Schedulers.boundedElastic());
+
+                    Mono<Void> tradesTask = tradeService.handleTrade(matchResponse)
+                            .subscribeOn(Schedulers.boundedElastic());
+
+                    Mono<Void> portfolioTask = portfolioService.handlePortfolioUpdates(matchResponse)
+                            .subscribeOn(Schedulers.boundedElastic());
+
+                    return Mono.when(ordersTask, tradesTask, portfolioTask);
+                });
     }
 
 }
