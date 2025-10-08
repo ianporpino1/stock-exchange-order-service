@@ -13,6 +13,7 @@ public class OrderProcessingService {
     private final TradeService tradeService;
     private final PortfolioService portfolioService;
     private final OrderHandler orderHandler;
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OrderProcessingService.class);
 
     public OrderProcessingService(MatchService matchService, TradeService tradeService, PortfolioService portfolioService, OrderHandler orderHandler) {
         this.matchService = matchService;
@@ -36,7 +37,11 @@ public class OrderProcessingService {
                             .subscribeOn(Schedulers.boundedElastic());
 
                     return Mono.when(ordersTask, tradesTask, portfolioTask);
-                });
+                })
+                .doOnError(error -> {
+                    log.error("Falha ao processar o comando da ordem: {}. Causa do erro: {}", command, error.getMessage());
+                })
+                .onErrorResume(_ -> Mono.empty());
     }
 
 }
