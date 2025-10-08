@@ -24,5 +24,11 @@ CREATE TABLE IF NOT EXISTS trade (
     executed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
+CREATE TABLE IF NOT EXISTS ticker (
+    symbol VARCHAR(10) PRIMARY KEY,
+    last_price DECIMAL(10, 2),
+    last_trade_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE INDEX IF NOT EXISTS idx_trade_order_status ON trade_order(status);
 CREATE INDEX IF NOT EXISTS idx_trade_order_user_id ON trade_order(user_id);
