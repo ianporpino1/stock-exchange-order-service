@@ -1,6 +1,5 @@
 package com.stockexchange.orderservice.service;
 
-import com.stockexchange.orderservice.model.Order;
 import com.stockexchange.orderservice.model.dto.MatchResponse;
 import com.stockexchange.orderservice.model.dto.OrderResponse;
 import com.stockexchange.orderservice.repository.OrderRepository;

@@ -1,8 +1,6 @@
 package com.stockexchange.orderservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -11,8 +9,6 @@ import java.time.Instant;
 public class Ticker {
 
     @Id
-    private Long id;
-
     private String symbol;
 
     private BigDecimal lastPrice;
@@ -29,13 +25,6 @@ public class Ticker {
 
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getSymbol() {
         return symbol;

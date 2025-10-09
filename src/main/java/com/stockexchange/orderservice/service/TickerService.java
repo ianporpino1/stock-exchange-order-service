@@ -5,9 +5,9 @@ import com.stockexchange.orderservice.model.dto.MatchResponse;
 import com.stockexchange.orderservice.model.dto.TradeResponse;
 import com.stockexchange.orderservice.repository.TickerRepository;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -20,7 +20,8 @@ public class TickerService {
     }
 
     public BigDecimal findLastPriceBySymbol(String symbol){
-        return tickerRepository.findBySymbol(symbol).map(Ticker::getLastPrice).orElse(BigDecimal.ZERO);
+        return tickerRepository.findBySymbol(symbol).map(Ticker::getLastPrice)
+                .orElseThrow(() -> new NoSuchElementException("No ticker found for symbol: " + symbol));
     }
 
     public void handleTickers(MatchResponse matchResponse) {
