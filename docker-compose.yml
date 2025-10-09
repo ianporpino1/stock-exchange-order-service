@@ -6,6 +6,8 @@ services:
       - postgres
     ports:
       - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
     networks:
       - stock_exchange_network
 

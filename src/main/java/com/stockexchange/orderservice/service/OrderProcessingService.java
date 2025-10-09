@@ -21,7 +21,7 @@ public class OrderProcessingService {
         this.orderHandler = orderHandler;
     }
 
-    @Async
+//    @Async
     public void processOrder(CreateOrderCommand command) {
         MatchResponse matchResponse = matchService.match(command);
         tickerService.handleTickers(matchResponse);

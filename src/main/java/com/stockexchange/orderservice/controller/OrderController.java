@@ -36,7 +36,7 @@ public class OrderController {
 
         URI location = URI.create(String.format("/orders/%s", orderResponse.orderId()));
 
-        return ResponseEntity.ok().location(location).body(orderResponse);
+        return ResponseEntity.accepted().location(location).body(orderResponse);
     }
     
     @GetMapping("/{id}")
