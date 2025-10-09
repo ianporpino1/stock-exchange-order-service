@@ -32,3 +32,7 @@ CREATE TABLE IF NOT EXISTS ticker (
 
 CREATE INDEX IF NOT EXISTS idx_trade_order_status ON trade_order(status);
 CREATE INDEX IF NOT EXISTS idx_trade_order_user_id ON trade_order(user_id);
+
+INSERT INTO ticker (symbol, last_price) VALUES ('AAPL', 200.00) ON CONFLICT (symbol) DO NOTHING;
+INSERT INTO ticker (symbol, last_price) VALUES ('MSFT', 150.00) ON CONFLICT (symbol) DO NOTHING;
+INSERT INTO ticker (symbol, last_price) VALUES ('GOOGL', 100.00) ON CONFLICT (symbol) DO NOTHING;
