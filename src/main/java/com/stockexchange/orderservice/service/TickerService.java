@@ -23,15 +23,8 @@ public class TickerService {
                 .map(Ticker::getLastPrice);
     }
 
-    public Mono<Void> updateLastPrice(String symbol, BigDecimal newPrice, Instant lastTradeTimestamp) {
-        return tickerRepository.findTickerBySymbol(symbol)
-                .flatMap(ticker -> {
-                    ticker.setLastPrice(newPrice);
-                    ticker.setLastTradeTimestamp(lastTradeTimestamp);
-                    return tickerRepository.save(ticker);
-                })
-                .switchIfEmpty(Mono.defer(() -> tickerRepository.save(new Ticker(symbol,newPrice, lastTradeTimestamp))))
-                .then();
+    private Mono<Void> updateLastPrice(String symbol, BigDecimal newPrice, Instant lastTradeTimestamp) {
+        return tickerRepository.save(new Ticker(symbol, newPrice, lastTradeTimestamp));
     }
 
     public Mono<Void> handleTickers(MatchResponse matchResponse) {
