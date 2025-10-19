@@ -5,19 +5,16 @@ import com.stockexchange.orderservice.model.dto.OrderRequest;
 import com.stockexchange.orderservice.model.dto.OrderResponse;
 import com.stockexchange.orderservice.service.OrderCreationService;
 import com.stockexchange.orderservice.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -32,16 +29,12 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PostMapping
-    public Mono<ResponseEntity<OrderResponse>> createOrder(@RequestBody Mono<OrderRequest> orderRequestMono,
-                                                     @AuthenticationPrincipal Jwt principal) {
+    @MutationMapping
+    public Mono<OrderResponse> createOrder(@Argument("orderInput") OrderRequest orderInput,
+                                           @AuthenticationPrincipal Jwt principal) {
         UUID userId = UUID.fromString(principal.getSubject());
-        return orderRequestMono
-                .flatMap(orderRequest -> orderCreationService.createOrder(orderRequest, userId))
-                .map(orderResponse -> {
-                    URI location = URI.create(String.format("/orders/%s", orderResponse.orderId()));
-                    return ResponseEntity.created(location).body(orderResponse);
-                });
+
+        return orderCreationService.createOrder(orderInput, userId);
     }
     
     @GetMapping("/{id}")

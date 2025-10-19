@@ -35,28 +35,28 @@ public class ApiConfig {
         return builder;
     }
 
-    @Bean
-    public MatchingClient matchingClient(WebClient.Builder builder) {
-        WebClient webClient = builder
-                .baseUrl("http://matching-service")
-                .build();
-        WebClientAdapter adapter = WebClientAdapter.create(webClient);
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(adapter)
-                .build();
-        return factory.createClient(MatchingClient.class);
-    }
-    @Bean
-    public PortfolioClient portfolioClient(WebClient.Builder builder) {
-        WebClient webClien = builder
-                .baseUrl("http://portfolio-service")
-                .build();
-        WebClientAdapter adapter = WebClientAdapter.create(webClien);
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(adapter)
-                .build();
-        return factory.createClient(PortfolioClient.class);
-    }
+//    @Bean
+//    public MatchingClient matchingClient(WebClient.Builder builder) {
+//        WebClient webClient = builder
+//                .baseUrl("http://matching-service")
+//                .build();
+//        WebClientAdapter adapter = WebClientAdapter.create(webClient);
+//        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+//                .builderFor(adapter)
+//                .build();
+//        return factory.createClient(MatchingClient.class);
+//    }
+//    @Bean
+//    public PortfolioClient portfolioClient(WebClient.Builder builder) {
+//        WebClient webClien = builder
+//                .baseUrl("http://portfolio-service")
+//                .build();
+//        WebClientAdapter adapter = WebClientAdapter.create(webClien);
+//        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+//                .builderFor(adapter)
+//                .build();
+//        return factory.createClient(PortfolioClient.class);
+//    }
 
     @Bean(name = "taskExecutor")
     public TaskExecutor taskExecutor() {

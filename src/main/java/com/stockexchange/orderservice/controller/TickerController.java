@@ -1,16 +1,14 @@
 package com.stockexchange.orderservice.controller;
 
 import com.stockexchange.orderservice.service.TickerService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
-
 import java.math.BigDecimal;
 
-@RestController
-@RequestMapping("tickers")
+
+@Controller
 public class TickerController {
 
     private final TickerService tickerService;
@@ -20,8 +18,8 @@ public class TickerController {
     }
 
 
-    @GetMapping("/{symbol}/last-price")
-    public Mono<BigDecimal> getLastPriceForTicker(@PathVariable String symbol) {
+    @QueryMapping
+    public Mono<BigDecimal> price(@Argument String symbol) {
         return tickerService.findLastPriceBySymbol(symbol);
     }
 }

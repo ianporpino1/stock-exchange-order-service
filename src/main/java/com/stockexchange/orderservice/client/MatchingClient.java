@@ -1,41 +1,70 @@
 package com.stockexchange.orderservice.client;
 
 import com.stockexchange.orderservice.model.dto.CreateOrderCommand;
-import com.stockexchange.orderservice.model.dto.MatchRequest;
 import com.stockexchange.orderservice.model.dto.MatchResponse;
-import com.stockexchange.orderservice.model.dto.OrderResponse;
-import io.github.resilience4j.bulkhead.annotation.Bulkhead;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import io.github.resilience4j.retry.annotation.Retry;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.service.annotation.GetExchange;
-import org.springframework.web.service.annotation.HttpExchange;
-import org.springframework.web.service.annotation.PostExchange;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import java.util.Map;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.UUID;
+@Service
+public class MatchingClient {
 
-@HttpExchange(accept = "application/json", contentType = "application/json")
-public interface MatchingClient {
+    private final WebClient webClient;
 
-    @PostExchange(value = "/match")
-//    @CircuitBreaker(name = "matching-service", fallbackMethod = "matchFallback")
-//    @Bulkhead(name = "matching-service")
-//    @Retry(name = "matching-service")
-//    @RateLimiter(name = "matching-service")
-    Mono<MatchResponse> match(@RequestBody CreateOrderCommand request);
-
-    default MatchResponse matchFallback(CreateOrderCommand command, Throwable t) {
-        System.err.printf("FALLBACK ATIVADO para a ordem %s. Causa: %s%n",
-                command.orderId(), t.getMessage());
-
-        return new MatchResponse(Collections.emptyList(), Collections.emptyList());
+    public MatchingClient(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.baseUrl("http://matching-service").build();
     }
 
-    @GetExchange(value = "/orders/{orderId}")
-    OrderResponse getOrderById(@PathVariable UUID orderId);
-}
+    public Mono<MatchResponse> match(CreateOrderCommand request) {
+        String mutation = """
+            mutation MatchOrder($order: CreateOrderCommandInput!) {
+              matchOrder(order: $order) {
+                orders {
+                  orderId
+                  orderStatus
+                  totalQuantity
+                  executedQuantity
+                }
+                trades {
+                  tradeId
+                  symbol
+                  quantity
+                  price
+                  executedAt
+                  buyOrderId
+                  sellOrderId
+                  buyerUserId
+                  sellerUserId
+                }
+              }
+            }
+        """;
+
+        GraphQLRequest graphQLRequest = new GraphQLRequest(
+                mutation,
+                Map.of("order", request)
+        );
+
+        return webClient.post()
+                .uri("/graphql")
+                .bodyValue(graphQLRequest)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<GraphQLResponse<MatchData>>() {})
+                .flatMap(response -> {
+                    if (response.errors() != null) {
+                        System.err.println("Erro retornado pelo matching-service: " + response.errors());
+                        return Mono.error(new RuntimeException("Falha na mutação 'matchOrder'."));
+                    }
+                    if (response.data() == null) {
+                        return Mono.error(new RuntimeException("Resposta do matching-service não continha dados."));
+                    }
+                    return Mono.just(response.data().matchOrder());
+                });
+    }
+
+    public record GraphQLRequest(String query, Map<String, Object> variables) { }
+    public record GraphQLResponse<T>(T data, Object errors) { }
+
+    public record MatchData(MatchResponse matchOrder) {}}

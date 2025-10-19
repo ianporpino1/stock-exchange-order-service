@@ -1,0 +1,62 @@
+"""
+Input para criar uma nova ordem de compra ou venda.
+Corresponde ao record 'OrderRequest' no Java.
+"""
+input OrderInput {
+    symbol: String!
+    price: Float!
+    quantity: Int!
+    orderType: OrderType!
+}
+
+"""
+Enum para os tipos de ordem.
+"""
+enum OrderType {
+    BUY
+    SELL
+}
+
+"""
+Enum para o status da ordem.
+"""
+enum OrderStatus {
+    REJECTED
+    ACCEPTED
+    PARTIALLY_EXECUTED
+    TOTALLY_EXECUTED
+    PENDING
+}
+
+"""
+A resposta retornada após a criação da ordem.
+"""
+type OrderResponse {
+    orderId: ID!
+    orderStatus: OrderStatus!
+    orderType: OrderType!
+    symbol: String!
+    price: Float!
+    executedQuantity: Int!
+    totalQuantity: Int!
+    orderDate: String!
+    userId: ID!
+}
+
+"""
+Define as operações de mutação disponíveis.
+"""
+type Mutation {
+    """
+    Cria uma nova ordem e retorna seus detalhes.
+    Exige autenticação.
+    """
+    createOrder(orderInput: OrderInput!): OrderResponse
+}
+
+type Query {
+    """
+    Busca o último preço negociado para um determinado símbolo de ação.
+    """
+    price(symbol: String!): Float
+}
