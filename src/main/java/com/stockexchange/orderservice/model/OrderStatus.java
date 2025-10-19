@@ -5,4 +5,5 @@ public enum OrderStatus {
     ACCEPTED,
     PARTIALLY_EXECUTED,
     TOTALLY_EXECUTED,
+    PENDING
 }
