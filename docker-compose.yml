@@ -5,11 +5,17 @@ services:
     depends_on:
       - postgres
       - redis
+      - rabbitmq
     ports:
       - "8081:8081"
     environment:
       - SPRING_PROFILES_ACTIVE=reactive-docker
       - CONFIG_SERVER_URL=http://config-server:8888
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=rabbit
+      - SPRING_RABBITMQ_PASSWORD=rabbit
+      - SPRING_DATA_REDIS_HOST=redis-service
     networks:
       - stock_exchange_network
 
@@ -32,6 +38,18 @@ services:
     container_name: redis-service
     ports:
       - "6379:6379"
+    networks:
+      - stock_exchange_network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit
+      RABBITMQ_DEFAULT_PASS: rabbit
     networks:
       - stock_exchange_network
 
