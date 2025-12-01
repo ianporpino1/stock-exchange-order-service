@@ -26,7 +26,7 @@ public class TradeHandler {
     }
 
     @Bean
-    public Consumer<Flux<TradeExecutedEvent>> handleTrade(){
+    public Function<Flux<TradeExecutedEvent>, Mono<Void>> handleTrade(){
         return flux -> flux
                 .filter(Objects::nonNull)
                 .concatMap(event -> {
@@ -52,7 +52,7 @@ public class TradeHandler {
                         return Mono.empty();
                     }));
                 })
-                .subscribe();
+                .then();
     }
 
 }

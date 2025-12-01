@@ -21,7 +21,7 @@ public class OrderHandler {
     }
 
     @Bean
-    public Consumer<Flux<OrderUpdatedEvent>> handleOrder() {
+    public Function<Flux<OrderUpdatedEvent>, Mono<Void>> handleOrder() {
         return flux -> flux
                 .filter(Objects::nonNull)
                 .concatMap(event ->
@@ -35,6 +35,6 @@ public class OrderHandler {
                                     return Mono.empty();
                                 })
                 )
-                .subscribe();
+                .then();
     }
 }
