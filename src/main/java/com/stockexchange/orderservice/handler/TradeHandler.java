@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Configuration
@@ -24,8 +26,9 @@ public class TradeHandler {
     }
 
     @Bean
-    public Function<Flux<TradeExecutedEvent>, Mono<Void>> handleTrade(){
+    public Consumer<Flux<TradeExecutedEvent>> handleTrade(){
         return flux -> flux
+                .filter(Objects::nonNull)
                 .concatMap(event -> {
 
                     Mono<Void> saveOp = tradeService.handleTrade(new TradeResponse(
@@ -49,7 +52,7 @@ public class TradeHandler {
                         return Mono.empty();
                     }));
                 })
-                .then();
+                .subscribe();
     }
 
 }

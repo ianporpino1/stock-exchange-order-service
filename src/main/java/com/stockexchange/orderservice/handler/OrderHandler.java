@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Configuration
@@ -19,8 +21,9 @@ public class OrderHandler {
     }
 
     @Bean
-    public Function<Flux<OrderUpdatedEvent>, Mono<Void>> handleOrder() {
+    public Consumer<Flux<OrderUpdatedEvent>> handleOrder() {
         return flux -> flux
+                .filter(Objects::nonNull)
                 .concatMap(event ->
                         orderRepository.updateOrderFromMatch(
                                         event.orderId(),
@@ -32,6 +35,6 @@ public class OrderHandler {
                                     return Mono.empty();
                                 })
                 )
-                .then();
+                .subscribe();
     }
 }
