@@ -7,11 +7,9 @@ import com.stockexchange.orderservice.service.TickerService;
 import com.stockexchange.orderservice.service.TradeService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Configuration
@@ -26,9 +24,10 @@ public class TradeHandler {
     }
 
     @Bean
-    public Function<Flux<TradeExecutedEvent>, Mono<Void>> handleTrade(){
+    public Function<Flux<Message<TradeExecutedEvent>>, Mono<Void>> handleTrade(){
         return flux -> flux
-                .filter(Objects::nonNull)
+                .filter(msg -> "trade.executed".equals(msg.getHeaders().get("eventType")))
+                .map(Message::getPayload)
                 .concatMap(event -> {
 
                     Mono<Void> saveOp = tradeService.handleTrade(new TradeResponse(
