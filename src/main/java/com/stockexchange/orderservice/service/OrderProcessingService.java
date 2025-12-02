@@ -12,12 +12,10 @@ public class OrderProcessingService {
 
     private final StreamBridge streamBridge;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OrderProcessingService.class);
-    private static final String DESTINATION_HEADER ="spring.cloud.stream.sendto.destination";
 
     public OrderProcessingService(StreamBridge streamBridge) {
         this.streamBridge = streamBridge;
     }
-
 
     public Mono<Void> processOrder(CreateOrderCommand command) {
         var message = MessageBuilder.withPayload(new OrderCreatedEvent(
@@ -28,9 +26,9 @@ public class OrderProcessingService {
                         command.quantity(),
                         command.orderType(),
                         command.createdAt()))
-                .setHeader(DESTINATION_HEADER, "orders.created")
+                .setHeader("eventType", "order.created")
                 .build();
-        streamBridge.send("orders.created", message);
+        streamBridge.send("orderEvents-out-0", message);
         return Mono.empty();
     }
 }

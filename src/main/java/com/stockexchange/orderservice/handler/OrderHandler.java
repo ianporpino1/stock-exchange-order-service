@@ -4,11 +4,10 @@ import com.stockexchange.orderservice.model.event.OrderUpdatedEvent;
 import com.stockexchange.orderservice.repository.OrderRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Configuration
@@ -21,9 +20,10 @@ public class OrderHandler {
     }
 
     @Bean
-    public Function<Flux<OrderUpdatedEvent>, Mono<Void>> handleOrder() {
+    public Function<Flux<Message<OrderUpdatedEvent>>, Mono<Void>> handleOrder() {
         return flux -> flux
-                .filter(Objects::nonNull)
+                .filter(msg -> "order.updated".equals(msg.getHeaders().get("eventType")))
+                .map(Message::getPayload)
                 .concatMap(event ->
                         orderRepository.updateOrderFromMatch(
                                         event.orderId(),
