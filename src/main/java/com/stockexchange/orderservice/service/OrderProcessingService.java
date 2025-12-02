@@ -2,6 +2,7 @@ package com.stockexchange.orderservice.service;
 
 import com.stockexchange.orderservice.model.dto.CreateOrderCommand;
 import com.stockexchange.orderservice.model.event.OrderCreatedEvent;
+import com.stockexchange.orderservice.model.event.OrderUpdatedEvent;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.stereotype.Service;
@@ -26,9 +27,15 @@ public class OrderProcessingService {
                         command.quantity(),
                         command.orderType(),
                         command.createdAt()))
-                .setHeader("eventType", "order.created")
                 .build();
         streamBridge.send("orderEvents-out-0", message);
+
         return Mono.empty();
     }
+
+    public Mono<Void> processOrder(OrderUpdatedEvent event) {
+        return Mono.empty();
+    }
+
+
 }
