@@ -29,7 +29,6 @@ public class OrderProcessingService {
                         command.orderType(),
                         command.createdAt()))
                 .setHeader("eventType", "order.created")
-                .setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON)
                 .build();
         streamBridge.send("orderEvents-out-0", message);
         return Mono.empty();

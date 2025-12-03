@@ -21,7 +21,9 @@ public class OrderHandler {
 
     @Bean
     public Function<Flux<Message<OrderEvent.OrderUpdated>>, Mono<Void>> handleOrderUpdate() {
-        return flux -> flux.concatMap(message -> {
+        return flux -> flux
+                .filter(msg -> "order.updated".equals(msg.getHeaders().get("eventType")))
+                .concatMap(message -> {
             OrderEvent.OrderUpdated event = message.getPayload();
             return orderRepository.updateOrderFromMatch(
                     event.orderId(), event.orderStatus(), event.executedQuantity()
@@ -31,7 +33,9 @@ public class OrderHandler {
 
     @Bean
     public Function<Flux<Message<OrderEvent.OrderRejected>>, Mono<Void>> handleOrderRejected() {
-        return flux -> flux.concatMap(message -> {
+        return flux -> flux
+                .filter(msg -> "order.rejected".equals(msg.getHeaders().get("eventType")))
+                .concatMap(message -> {
             OrderEvent.OrderRejected event = message.getPayload();
             return orderRepository.updateStatus(
                     event.orderId(), OrderStatus.REJECTED,
