@@ -1,8 +1,11 @@
 package com.stockexchange.orderservice.service;
 
+import com.stockexchange.orderservice.model.OrderStatus;
 import com.stockexchange.orderservice.model.dto.*;
 import com.stockexchange.orderservice.model.Order;
+import com.stockexchange.orderservice.model.event.BalanceEvent;
 import com.stockexchange.orderservice.repository.OrderRepository;
+import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,5 +42,9 @@ public class OrderService {
 
     public void saveAll(List<Order> orders) {
         orderRepository.saveAll(orders);
+    }
+
+    public Mono<Void> rejectOrder(BalanceEvent.BalanceReservationFailed event) {
+        return orderRepository.updateStatus(event.orderId(), OrderStatus.REJECTED, OrderStatus.PENDING);
     }
 }
