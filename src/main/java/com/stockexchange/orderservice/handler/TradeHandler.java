@@ -3,11 +3,13 @@ package com.stockexchange.orderservice.handler;
 import com.stockexchange.orderservice.model.Trade;
 import com.stockexchange.orderservice.model.dto.TradeResponse;
 import com.stockexchange.orderservice.model.event.TradeExecutedEvent;
+import com.stockexchange.orderservice.model.event.UpdatePortfolioCommand;
 import com.stockexchange.orderservice.service.TickerService;
 import com.stockexchange.orderservice.service.TradeService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.util.function.Function;
@@ -24,11 +26,9 @@ public class TradeHandler {
     }
 
     @Bean
-    public Function<Flux<Message<TradeExecutedEvent>>, Mono<Void>> handleTrade(){
+    public Function<Flux<TradeExecutedEvent>, Flux<Message<UpdatePortfolioCommand>>> handleTrade() {
         return flux -> flux
-                .filter(msg -> "trade.executed".equals(msg.getHeaders().get("eventType")))
-                .map(Message::getPayload)
-                .concatMap(event -> {
+                .flatMap(event -> {
 
                     Mono<Void> saveOp = tradeService.handleTrade(new TradeResponse(
                             event.tradeId(),
@@ -39,19 +39,22 @@ public class TradeHandler {
                             event.symbol(),
                             event.quantity(),
                             event.price(),
-                            event.executedAt()));
+                            event.executedAt()
+                    ));
 
                     Mono<Void> tickerOp = tickerService.updateLastPrice(
                             event.symbol(),
                             event.price(),
                             event.executedAt()
-                    );
-                    return Mono.when(saveOp, tickerOp.onErrorResume(e -> {
-                        log.error("Erro ao atualizar ticker: " + event.symbol(), e);
+                    ).onErrorResume(e -> {
+                        log.error("Erro ao atualizar ticker: {}", event.symbol(), e);
                         return Mono.empty();
-                    }));
-                })
-                .then();
+                    });
+                    return Mono.when(saveOp, tickerOp)
+                            .thenReturn(MessageBuilder.withPayload(new UpdatePortfolioCommand(event))
+                                    .setHeader("eventType", "portfolio.update")
+                                    .build());
+                });
     }
 
 }
