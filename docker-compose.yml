@@ -62,7 +62,6 @@ services:
       - stock_exchange_network
     volumes:
       - ./kafka-data:/var/lib/kafka/data
-      - ./kafka-data:/kafka-logs
     environment:
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_NODE_ID: 1
@@ -71,7 +70,6 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_NUM_PARTITIONS: 1
-      KAFKA_LOG_DIRS: /kafka-logs
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
 networks:
